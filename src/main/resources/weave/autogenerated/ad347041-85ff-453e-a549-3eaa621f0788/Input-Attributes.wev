@@ -1,0 +1,23 @@
+%dw 2.0
+
+type auto_ad347041_85ff_453e_a549_3eaa621f0788_Input_Attributes = {|
+  clientCertificate?: {|
+    publicKey?: {|  |}, 
+    "type"?: String, 
+    encoded?: Binary
+  |}, 
+  headers: {|  |}, 
+  listenerPath: String, 
+  method: String, 
+  queryParams: {|  |}, 
+  queryString: String, 
+  relativePath: String, 
+  remoteAddress: String, 
+  requestPath: String, 
+  requestUri: String, 
+  scheme: String, 
+  uriParams: {| transId: String |}, 
+  version: String, 
+  localAddress: String
+|}
+

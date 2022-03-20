@@ -1,0 +1,189 @@
+#%RAML 1.0
+title: Transactions
+
+types:
+  Transaction: !include Data_Types/TransactionsDatatypes.raml
+/transactions:
+  get:
+    description: Retrieves all account details
+    responses:
+      200:
+        body:
+          application/json:
+            type: Transaction[]
+            example: !include Examples/TransactionsExamples.raml
+      400:
+        body:
+          application/json:
+            example:
+              {
+                "message": "Bad request"
+              }
+      404:
+        body:
+          application/json:
+            example:
+              {
+                "message": "transaction not found"
+              }
+      405:
+        body:
+          application/json:
+            example:
+              {
+                "message": "Method not allowed"
+              }
+      500:
+        body:
+          application/json:
+            example:
+              {
+                "message": "Internal server error"
+              }
+      502:
+        body:
+          application/json:
+            example:
+              {
+                "message": "Bad gateway"
+              }
+  post:
+    description: Add new account
+    body:
+      application/json:
+        type: Transaction
+        example: !include Examples/TransactionsWithoutid.raml
+    responses:
+      201:
+        body:
+          application/json:
+            example:
+              {
+                "message": "New transaction added"
+              }
+      400:
+        body:
+          application/json:
+            example:
+              {
+                "message": "Bad request"
+              }
+      404:
+        body:
+          application/json:
+            example:
+              {
+                "message": "transaction not found"
+              }
+      405:
+        body:
+          application/json:
+            example:
+              {
+                "message": "Method not allowed"
+              }
+      500:
+        body:
+          application/json:
+            example:
+              {
+                "message": "Internal server error"
+              }
+      502:
+        body:
+          application/json:
+            example:
+              {
+                "message": "Bad gateway"
+              }
+/transactions/{transId}:
+    get:
+      description: Retrieves transaction details for given id
+      responses:
+        200:
+          body:
+            application/json:
+              type: Transaction
+              example: !include Examples/TrasanctionsWithID.raml
+        400:
+          body:
+            application/json:
+              example:
+                {
+                  "message": "Bad request"
+                }
+        404:
+          body:
+            application/json:
+              example:
+                {
+                  "message": "transaction not found"
+                }
+        405:
+          body:
+            application/json:
+              example:
+                {
+                  "message": "Method not allowed"
+                }
+        500:
+          body:
+            application/json:
+              example:
+                {
+                  "message": "Internal server error"
+                }
+        502:
+          body:
+            application/json:
+              example:
+                {
+                  "message": "Bad gateway"
+                }
+    delete:
+      description: Deletes transaction details for given id
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+                {
+                  "message": "transaction deleted"
+                }
+        400:
+          body:
+            application/json:
+              example:
+                {
+                  "message": "Bad request"
+                }
+        404:
+          body:
+            application/json:
+              example:
+                {
+                  "message": "transaction not found"
+                }
+        405:
+          body:
+            application/json:
+              example:
+                {
+                  "message": "Method not allowed"
+                }
+        500:
+          body:
+            application/json:
+              example:
+                {
+                  "message": "Internal server error"
+                }
+        502:
+          body:
+            application/json:
+              example:
+                {
+                  "message": "Bad gateway"
+                }
+    
+
