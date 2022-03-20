@@ -1,0 +1,12 @@
+%dw 2.0
+
+type auto_a6f9bc36_455e_4feb_91c0_66fb665e61c1_Input_Payload = {
+  amount: String, 
+  transType: String, 
+  transId?: String, 
+  accountNo: String, 
+  transDate: String, 
+  status: String, 
+  _?: Any
+}
+

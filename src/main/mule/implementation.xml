@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="GetAllFlow" doc:id="c3d8646b-6c0a-4759-9a5d-eb7a4ef741bd" >
+		<db:select doc:name="Select" doc:id="580a4015-5309-4619-86b3-1458ff5a0e5c" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from transactions]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="8bbd750c-a39a-41e3-b600-bffebc31ae31" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	transId: payload01.tid,
+	transType: payload01.transactionType default "",
+	accountNo: payload01.accountId default "",
+	amount: payload01.transactionAmount as String default "",
+	transDate: payload01.transactionDate as String default "",
+	status: payload01.transactioStatus default ""
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="GetIDFlow" doc:id="5e3793ae-c913-49d8-8aa4-f1e78fb84a90" >
+		<db:query-single doc:name="Query single" doc:id="4141ccc3-92b1-4e60-bf6c-1b959b3da4fb" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from transactions where tid = :a]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	a:vars.transid
+}]]]></db:input-parameters>
+		</db:query-single>
+		<ee:transform doc:name="Transform Message" doc:id="b5bdf94f-569d-4cdd-9b93-1e1467bb20f2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	transId: payload.tid,
+	transType: payload.transactionType default "",
+	accountNo: payload.accountId default "",
+	amount: payload.transactionAmount as String default "",
+	transDate: payload.transactionDate as String default "",
+	status: payload.transactioStatus default ""
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="DeleteFlow" doc:id="ad347041-85ff-453e-a549-3eaa621f0788" >
+		<db:delete doc:name="Delete" doc:id="8ca1ca37-8436-4bdf-addc-58dd293995c7" config-ref="Database_Config">
+			<db:sql ><![CDATA[delete from transactions where tid = :b]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	b:vars.transid
+}]]]></db:input-parameters>
+		</db:delete>
+		<ee:transform doc:name="Transform Message" doc:id="da5fcc44-1210-409c-82f1-c58c3bb455a1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "deleted successfully"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<sub-flow name="VariableSub_Flow" doc:id="c06b9f5d-4993-4b33-9592-7102fe684595" >
+		<set-variable value="#[message.payload.transactionType]" doc:name="transactionType" doc:id="4faeb14b-a58a-481c-8afd-572ad0756235" variableName="transactionType"/>
+		<set-variable value="#[message.payload.accountId]" doc:name="accountId" doc:id="d66f63c1-b6af-4b8d-adcf-450358747c0f" variableName="accountId"/>
+		<set-variable value="#[message.payload.transactionAmount]" doc:name="transactionAmount" doc:id="7317f638-ca9f-4d6c-986c-85031a7c1fb2" variableName="transactionAmount"/>
+		<set-variable value="#[message.payload.transactionDate]" doc:name="transactionDate" doc:id="21bee1f9-9e84-42f1-930a-a2a084eab15d" variableName="transactionDate"/>
+		<set-variable value="#[message.payload.transactioStatus]" doc:name="transactioStatus" doc:id="31e1b24a-fe50-43e0-9c88-f3850a1bb36c" variableName="transactioStatus"/>
+	</sub-flow>
+	<flow name="PostFlow" doc:id="a6f9bc36-455e-4feb-91c0-66fb665e61c1" >
+		<flow-ref doc:name="Flow Reference" doc:id="773d4bfe-97bc-48db-86f9-ebd7af3f0208" name="VariableSub_Flow"/>
+		<db:query-single doc:name="Query single" doc:id="fc55e853-edc6-4794-b4af-d4677266560b" config-ref="Database_Config">
+			<db:sql ><![CDATA[select max(tid) from transactions]]></db:sql>
+		</db:query-single>
+		<set-variable value='#["T" ++ ((payload."max(tid)") [1 to 4] as Number + 1)]' doc:name="tid" doc:id="ee356456-5aa8-4345-a0f6-fb077b60dd15" variableName="tid"/>
+		<db:insert doc:name="Insert" doc:id="23d2d504-c854-4a95-a750-e3b4e9aa53f2" config-ref="Database_Config">
+			<db:sql ><![CDATA[insert into transactions(tid,transactionType,accountId,transactionAmount,transactionDate,transactioStatus) values(:c, :d, :e, :f, :g, :h)]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	c:vars.tid,
+	d:vars.transactionType,
+	e:vars.accountId,
+	f:vars.transactionAmount,
+	g:vars.transactionDate,
+	h:vars.transactioStatus
+}]]]></db:input-parameters>
+		</db:insert>
+		<ee:transform doc:name="Transform Message" doc:id="e2bee8ea-0481-4ab3-a89d-bf161210c1f0" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "transaction posted"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

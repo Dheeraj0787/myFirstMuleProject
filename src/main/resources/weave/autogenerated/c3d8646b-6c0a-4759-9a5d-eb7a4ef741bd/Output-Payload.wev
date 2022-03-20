@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_c3d8646b_6c0a_4759_9a5d_eb7a4ef741bd_Output_Payload = Array<{  amount: String,   transType: String,   transId?: String,   accountNo: String,   transDate: String,   status: String,   _?: Any}>
+
